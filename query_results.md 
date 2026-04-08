@@ -1,0 +1,504 @@
+
+
+## Query (A) — Titles of all books by Pratchett that cost less than $10
+
+```sql
+SELECT b.title
+FROM BOOK b
+JOIN BOOK_AUTHOR ba ON b.book_id = ba.book_id
+JOIN AUTHOR a ON ba.author_id = a.author_id
+WHERE (a.first_name || ' ' || a.last_name) LIKE '%Pratchett%'
+  AND b.price < 10;
+```
+
+| title              |
+| ------------------ |
+| Small Gods         |
+| Going Postal       |
+| Pyramids           |
+| Guards! Guards!    |
+| Unseen Academicals |
+
+
+
+---
+
+## Query (B) — Titles and purchase dates for a single customer (Alice Morgan)
+
+```sql
+SELECT b.title, o.order_date
+FROM ORDERS o
+JOIN ORDER_ITEM oi ON o.order_id = oi.order_id
+JOIN BOOK b ON oi.book_id = b.book_id
+WHERE o.customer_id = 1;
+```
+
+| title              | order_date |
+| ------------------ | ---------- |
+| Small Gods         | 2023-03-10 |
+| Going Postal       | 2023-03-10 |
+| Pyramids           | 2023-06-22 |
+| The Color of Magic | 2023-06-22 |
+| Guards! Guards!    | 2024-01-05 |
+
+
+---
+
+## Query (C) — Titles and ISBNs for books with less than 5 copies in stock
+
+```sql
+SELECT b.title, b.isbn
+FROM BOOK b
+JOIN INVENTORY i ON b.book_id = i.book_id
+WHERE i.stock_count < 5;
+```
+
+| title                                                                                  | isbn       |
+| -------------------------------------------------------------------------------------- | ---------- |
+| OCP: Oracle9i Certification Kit                                                        | 0782140661 |
+| SQL Server 2000 for Experienced DBA's                                                  | 0072227885 |
+| The Data Warehouse Toolkit: The Complete Guide to Dimensional Modeling                 | 0471200247 |
+| How To Do Everything with Your Tablet PC                                               | 0072227710 |
+| Data Mining: Practical Machine Learning Tools and Techniques with Java Implementations | 1558605525 |
+| Creating Documents with BusinessObjects 5.1                                            | 0972263608 |
+| The Guru's Guide to Transact-SQL                                                       | 0201615762 |
+| Access 2002 Developer's Handbook Set                                                   | 0782140114 |
+| ColdFusion MX Web Application Construction Kit                                         | 0321125169 |
+| Cerulean Sins                                                                          | 0425188361 |
+| Google Hacks                                                                           | 0596004478 |
+| The Pianist                                                                            | 0312311354 |
+| The Girl in the Red Coat: A Memoir                                                     | 0312287941 |
+| The Hours                                                                              | 0312243022 |
+| Twelve Times Blessed                                                                   | 0066214750 |
+| The Second Time Around                                                                 | 0743206061 |
+| The Rescuer: The O'Malley Series                                                       | 1590520734 |
+| Bel Canto: A Novel                                                                     | 0060934417 |
+| The Blank Slate: The Modern Denial of Human Nature                                     | 0670031518 |
+| Linked: The New Science of Networks                                                    | 0738206679 |
+| Consilience: The Unity of Knowledge                                                    | 067976867X |
+| The Future of Life                                                                     | 0679450785 |
+| A New Kind of Science                                                                  | 1579550088 |
+| A Field Guide to American Houses                                                       | 0394739698 |
+| Prefab                                                                                 | 1586851322 |
+| Cabins & Camps                                                                         | 1586851357 |
+| The New City Home: Smart Solutions for Metro Living                                    | 156158648X |
+| Composers' Houses                                                                      | 0865659982 |
+| Financial Modeling                                                                     | 0262024829 |
+| Advanced Accounting                                                                    | 0324107501 |
+| Financial Reporting and Analysis                                                       | 0130323519 |
+| The Guardian                                                                           | 0446527793 |
+| The Vampire's Violin                                                                   | 0345452089 |
+| Lullaby: A Novel                                                                       | 0385504470 |
+| Everything's Eventual: 14 Dark Tales                                                   | 0743457358 |
+| The Names                                                                              | 0679722955 |
+| Architecture: Form, Space, and Order                                                   | 0471286168 |
+| A Visual Dictionary of Architecture                                                    | 0471288217 |
+| The Magician's Assistant                                                               | 0156006219 |
+| How the Mind Works                                                                     | 0393318486 |
+| The Diversity of Life                                                                  | 0393319407 |
+| On Human Nature                                                                        | 067463442X |
+| A Walk to Remember                                                                     | 0446608955 |
+| Numerical Techniques in Finance                                                        | 0262521415 |
+| Econometric Analysis of Cross Section and Panel Data                                   | 0262232197 |
+| Introductory Econometrics: A Modern Approach                                           | 0324113641 |
+| Beyond Coso : Internal Control to Enhance Corporate Governance                         | 0471391123 |
+| Real World FPGA Design with Verilog                                                    | 0130998516 |
+| Ldap System Administration                                                             | 1565924916 |
+| The Photoshop Book for Digital Photographers                                           | 0735712360 |
+| Mac OS X v. 10.2 Jaguar Killer Tips                                                    | 0735713170 |
+| The Demon-Haunted World: Science As a Candle in the Dark                               | 0345409469 |
+| Broca's Brain: Reflections on the Romance of Science                                   | 0345336895 |
+| Pale Blue Dot: A Vision of the Human Future in Space                                   | 0345376595 |
+| The Lovely Bones: A Novel                                                              | 0316666343 |
+| Lucky: A Memoir                                                                        | 0316096199 |
+| Black Dogs                                                                             | 0385494327 |
+| Birthright                                                                             | 0399149848 |
+| The Complete Illustrated Guide to Furniture and Cabinet Construction                   | 1561584029 |
+| Choosing & Using Hand Tools                                                            | 1579902944 |
+| Going Postal                                                                           | 0060502935 |
+| Pyramids                                                                               | 0061020656 |
+| Unseen Academicals                                                                     | 0061161721 |
+
+
+
+---
+
+## Query (D) — Customers who purchased Pratchett books and the titles they bought
+
+```sql
+SELECT DISTINCT c.first_name || ' ' || c.last_name AS customer, b.title
+FROM CUSTOMER c
+JOIN ORDERS o ON c.customer_id = o.customer_id
+JOIN ORDER_ITEM oi ON o.order_id = oi.order_id
+JOIN BOOK b ON oi.book_id = b.book_id
+JOIN BOOK_AUTHOR ba ON b.book_id = ba.book_id
+JOIN AUTHOR a ON ba.author_id = a.author_id
+WHERE (a.first_name || ' ' || a.last_name) LIKE '%Pratchett%'
+ORDER BY customer, b.title;
+```
+
+| customer       | title              |
+| -------------- | ------------------ |
+| Alice Morgan   | Going Postal       |
+| Alice Morgan   | Guards! Guards!    |
+| Alice Morgan   | Pyramids           |
+| Alice Morgan   | Small Gods         |
+| Alice Morgan   | The Color of Magic |
+| Frank Williams | Small Gods         |
+| Frank Williams | The Color of Magic |
+| Frank Williams | Unseen Academicals |
+
+
+
+---
+
+## Query (E) — Total number of books purchased by a single customer (Alice Morgan)
+
+```sql
+SELECT c.first_name || ' ' || c.last_name AS customer,
+       SUM(oi.quantity) AS total_books_purchased
+FROM CUSTOMER c
+JOIN ORDERS o ON c.customer_id = o.customer_id
+JOIN ORDER_ITEM oi ON o.order_id = oi.order_id
+WHERE c.customer_id = 1;
+```
+
+| customer     | total_books_purchased |
+| ------------ | --------------------- |
+| Alice Morgan | 6                     |
+
+---
+
+## Query (F) — Customer(s) who purchased the most books and their total
+
+```sql
+SELECT c.first_name || ' ' || c.last_name AS customer,
+       SUM(oi.quantity) AS total_books
+FROM CUSTOMER c
+JOIN ORDERS o ON c.customer_id = o.customer_id
+JOIN ORDER_ITEM oi ON o.order_id = oi.order_id
+GROUP BY c.customer_id
+HAVING SUM(oi.quantity) = (
+    SELECT MAX(sub.total) FROM (
+        SELECT SUM(oi2.quantity) AS total
+        FROM ORDERS o2
+        JOIN ORDER_ITEM oi2 ON o2.order_id = oi2.order_id
+        GROUP BY o2.customer_id
+    ) sub
+);
+```
+
+| customer   | total_books |
+| ---------- | ----------- |
+| Bob Nguyen | 36          |
+
+*1 row(s) returned.*
+
+---
+
+## Query (G) — Total dollar amount spent by each customer
+
+```sql
+SELECT c.first_name || ' ' || c.last_name AS customer,
+       ROUND(SUM(oi.quantity * oi.unit_price * (1 - oi.discount_applied)), 2) AS total_spent
+FROM CUSTOMER c
+JOIN ORDERS o ON c.customer_id = o.customer_id
+JOIN ORDER_ITEM oi ON o.order_id = oi.order_id
+GROUP BY c.customer_id
+ORDER BY total_spent DESC;
+```
+
+| customer       | total_spent |
+| -------------- | ----------- |
+| Bob Nguyen     | 1576.54     |
+| David Park     | 139.2       |
+| Henry Patel    | 59.94       |
+| Alice Morgan   | 59.94       |
+| Grace Kim      | 59.9        |
+| Frank Williams | 29.97       |
+| Elena Torres   | 26.95       |
+| Clara Osei     | 17.44       |
+
+*8 row(s) returned.*
+
+---
+
+## Query (H) — Customers who spent more than the average customer (high-spenders)
+
+```sql
+SELECT c.first_name || ' ' || c.last_name AS customer,
+       ROUND(SUM(oi.quantity * oi.unit_price * (1 - oi.discount_applied)), 2) AS total_spent
+FROM CUSTOMER c
+JOIN ORDERS o ON c.customer_id = o.customer_id
+JOIN ORDER_ITEM oi ON o.order_id = oi.order_id
+GROUP BY c.customer_id
+HAVING total_spent > (
+    SELECT AVG(sub.total) FROM (
+        SELECT SUM(oi2.quantity * oi2.unit_price * (1 - oi2.discount_applied)) AS total
+        FROM ORDERS o2
+        JOIN ORDER_ITEM oi2 ON o2.order_id = oi2.order_id
+        GROUP BY o2.customer_id
+    ) sub
+)
+ORDER BY total_spent DESC;
+```
+
+| customer   | total_spent |
+| ---------- | ----------- |
+| Bob Nguyen | 1576.54     |
+
+*1 row(s) returned.*
+
+---
+
+## Query (I) — Titles and total copies sold, sorted by popularity
+
+```sql
+SELECT b.title, SUM(oi.quantity) AS copies_sold
+FROM BOOK b
+JOIN ORDER_ITEM oi ON b.book_id = oi.book_id
+GROUP BY b.book_id
+ORDER BY copies_sold DESC;
+```
+
+| title                                                                                                                 | copies_sold |
+| --------------------------------------------------------------------------------------------------------------------- | ----------- |
+| The Color of Magic                                                                                                    | 3           |
+| Google Hacks                                                                                                          | 3           |
+| The Secret Life of Bees                                                                                               | 3           |
+| MySQL                                                                                                                 | 3           |
+| Small Gods                                                                                                            | 2           |
+| The Girl in the Red Coat: A Memoir                                                                                    | 2           |
+| The Pianist                                                                                                           | 2           |
+| Investing in Fixer-Uppers : A Complete Guide to Buying Low, Fixing Smart, Adding Value, and Selling (or Renting) High | 2           |
+| Cerulean Sins                                                                                                         | 2           |
+| Professional SQL Server 2000 Programming                                                                              | 2           |
+| Fundamentals of Database Systems                                                                                      | 2           |
+| ColdFusion MX Web Application Construction Kit                                                                        | 2           |
+| Access 2002 Developer's Handbook Set                                                                                  | 2           |
+| The Guru's Guide to Transact-SQL                                                                                      | 2           |
+| Creating Documents with BusinessObjects 5.1                                                                           | 2           |
+| Data Mining: Practical Machine Learning Tools and Techniques with Java Implementations                                | 2           |
+| How To Do Everything with Your Tablet PC                                                                              | 2           |
+| The Data Warehouse Toolkit: The Complete Guide to Dimensional Modeling                                                | 2           |
+| SQL Server 2000 for Experienced DBA's                                                                                 | 2           |
+| OCP: Oracle9i Certification Kit                                                                                       | 2           |
+| Unseen Academicals                                                                                                    | 1           |
+| Guards! Guards!                                                                                                       | 1           |
+| Pyramids                                                                                                              | 1           |
+| Going Postal                                                                                                          | 1           |
+| Building a Shed                                                                                                       | 1           |
+| The Magician's Assistant                                                                                              | 1           |
+| Intermediate Accounting                                                                                               | 1           |
+| Prefab                                                                                                                | 1           |
+| Bel Canto: A Novel                                                                                                    | 1           |
+| The Hours                                                                                                             | 1           |
+
+*30 row(s) returned.*
+
+---
+
+## Query (J) — Titles and total revenue, sorted by profitability
+
+```sql
+SELECT b.title,
+       ROUND(SUM(oi.quantity * oi.unit_price * (1 - oi.discount_applied)), 2) AS total_revenue
+FROM BOOK b
+JOIN ORDER_ITEM oi ON b.book_id = oi.book_id
+GROUP BY b.book_id
+ORDER BY total_revenue DESC;
+```
+
+| title                                                                                                                 | total_revenue |
+| --------------------------------------------------------------------------------------------------------------------- | ------------- |
+| OCP: Oracle9i Certification Kit                                                                                       | 209.94        |
+| Creating Documents with BusinessObjects 5.1                                                                           | 198.0         |
+| Fundamentals of Database Systems                                                                                      | 190.0         |
+| Access 2002 Developer's Handbook Set                                                                                  | 139.98        |
+| Intermediate Accounting                                                                                               | 139.2         |
+| MySQL                                                                                                                 | 104.97        |
+| The Data Warehouse Toolkit: The Complete Guide to Dimensional Modeling                                                | 100.0         |
+| Data Mining: Practical Machine Learning Tools and Techniques with Java Implementations                                | 99.9          |
+| Professional SQL Server 2000 Programming                                                                              | 83.98         |
+| ColdFusion MX Web Application Construction Kit                                                                        | 76.98         |
+| The Guru's Guide to Transact-SQL                                                                                      | 76.98         |
+| Google Hacks                                                                                                          | 74.85         |
+| SQL Server 2000 for Experienced DBA's                                                                                 | 69.98         |
+| The Girl in the Red Coat: A Memoir                                                                                    | 51.9          |
+| The Secret Life of Bees                                                                                               | 42.0          |
+| The Color of Magic                                                                                                    | 41.97         |
+| Prefab                                                                                                                | 39.95         |
+| Investing in Fixer-Uppers : A Complete Guide to Buying Low, Fixing Smart, Adding Value, and Selling (or Renting) High | 37.9          |
+| How To Do Everything with Your Tablet PC                                                                              | 34.98         |
+| Cerulean Sins                                                                                                         | 32.14         |
+| The Pianist                                                                                                           | 26.0          |
+| Building a Shed                                                                                                       | 19.95         |
+| Small Gods                                                                                                            | 15.98         |
+| Bel Canto: A Novel                                                                                                    | 13.95         |
+| The Magician's Assistant                                                                                              | 13.0          |
+| Unseen Academicals                                                                                                    | 7.99          |
+| Guards! Guards!                                                                                                       | 7.99          |
+| Pyramids                                                                                                              | 7.99          |
+| Going Postal                                                                                                          | 7.99          |
+| The Hours                                                                                                             | 3.44          |
+
+*30 row(s) returned.*
+
+---
+
+## Query (K) — Most popular author(s) by books sold
+
+```sql
+SELECT a.first_name || ' ' || a.last_name AS author,
+       SUM(oi.quantity) AS books_sold
+FROM AUTHOR a
+JOIN BOOK_AUTHOR ba ON a.author_id = ba.author_id
+JOIN ORDER_ITEM oi ON ba.book_id = oi.book_id
+GROUP BY a.author_id
+HAVING books_sold = (
+    SELECT MAX(sub.sold) FROM (
+        SELECT SUM(oi2.quantity) AS sold
+        FROM BOOK_AUTHOR ba2
+        JOIN ORDER_ITEM oi2 ON ba2.book_id = oi2.book_id
+        GROUP BY ba2.author_id
+    ) sub
+);
+```
+
+| author           | books_sold |
+| ---------------- | ---------- |
+| Terry Pratchett  | 9          |
+
+*1 row(s) returned.*
+
+---
+
+## Query (L) — Most profitable author(s) by revenue
+
+```sql
+SELECT a.first_name || ' ' || a.last_name AS author,
+       ROUND(SUM(oi.quantity * oi.unit_price * (1 - oi.discount_applied)), 2) AS revenue
+FROM AUTHOR a
+JOIN BOOK_AUTHOR ba ON a.author_id = ba.author_id
+JOIN ORDER_ITEM oi ON ba.book_id = oi.book_id
+GROUP BY a.author_id
+HAVING revenue = (
+    SELECT MAX(sub.rev) FROM (
+        SELECT SUM(oi2.quantity * oi2.unit_price * (1 - oi2.discount_applied)) AS rev
+        FROM BOOK_AUTHOR ba2
+        JOIN ORDER_ITEM oi2 ON ba2.book_id = oi2.book_id
+        GROUP BY ba2.author_id
+    ) sub
+);
+```
+
+| author             | revenue |
+| ------------------ | ------- |
+| Doug Stuns         | 209.94  |
+| Biju Thomas        | 209.94  |
+| Chip Dawes         | 209.94  |
+| Matthew Weishan    | 209.94  |
+| Joseph C. Johnson  | 209.94  |
+
+*5 row(s) returned.*
+
+---
+
+## Query (M) — Customers who purchased books by the most profitable author(s)
+
+```sql
+WITH most_profitable AS (
+    SELECT a.author_id,
+           SUM(oi.quantity * oi.unit_price * (1 - oi.discount_applied)) AS revenue
+    FROM AUTHOR a
+    JOIN BOOK_AUTHOR ba ON a.author_id = ba.author_id
+    JOIN ORDER_ITEM oi ON ba.book_id = oi.book_id
+    GROUP BY a.author_id
+    HAVING revenue = (
+        SELECT MAX(sub.rev) FROM (
+            SELECT SUM(oi2.quantity * oi2.unit_price * (1 - oi2.discount_applied)) AS rev
+            FROM BOOK_AUTHOR ba2
+            JOIN ORDER_ITEM oi2 ON ba2.book_id = oi2.book_id
+            GROUP BY ba2.author_id
+        ) sub
+    )
+)
+SELECT DISTINCT c.first_name || ' ' || c.last_name AS customer
+FROM CUSTOMER c
+JOIN ORDERS o ON c.customer_id = o.customer_id
+JOIN ORDER_ITEM oi ON o.order_id = oi.order_id
+JOIN BOOK_AUTHOR ba ON oi.book_id = ba.book_id
+JOIN most_profitable mp ON ba.author_id = mp.author_id;
+```
+
+| customer   |
+| ---------- |
+| Bob Nguyen |
+
+*1 row(s) returned.*
+
+---
+
+## Query (N) — Authors of books purchased by high-spender customers
+
+```sql
+WITH high_spenders AS (
+    SELECT o.customer_id
+    FROM ORDERS o
+    JOIN ORDER_ITEM oi ON o.order_id = oi.order_id
+    GROUP BY o.customer_id
+    HAVING SUM(oi.quantity * oi.unit_price * (1 - oi.discount_applied)) > (
+        SELECT AVG(sub.total) FROM (
+            SELECT SUM(oi2.quantity * oi2.unit_price * (1 - oi2.discount_applied)) AS total
+            FROM ORDERS o2
+            JOIN ORDER_ITEM oi2 ON o2.order_id = oi2.order_id
+            GROUP BY o2.customer_id
+        ) sub
+    )
+)
+SELECT DISTINCT a.first_name || ' ' || a.last_name AS author
+FROM AUTHOR a
+JOIN BOOK_AUTHOR ba ON a.author_id = ba.author_id
+JOIN ORDER_ITEM oi ON ba.book_id = oi.book_id
+JOIN ORDERS o ON oi.order_id = o.order_id
+JOIN high_spenders hs ON o.customer_id = hs.customer_id
+ORDER BY author;
+```
+
+| author               |
+| -------------------- |
+| Angela C. Buraglia   |
+| Ben Forta            |
+| Biju Thomas          |
+| Bill Mann            |
+| Brian Knight         |
+| Chip Dawes           |
+| Doug Stuns           |
+| Eibe Frank           |
+| Ian H. Witten        |
+| Jay P. Decima        |
+| Joseph C. Johnson    |
+| Ken Getz             |
+| Ken Henderson        |
+| Laurell K. Hamilton  |
+| Leon Chalnick        |
+| Margy Ross           |
+| Matthew Weishan      |
+| Mike Gunderloy       |
+| Nate Weiss           |
+| Paul DuBois          |
+| Paul Litwin          |
+| Rael Dornfest        |
+| Ralph Kimball        |
+| Ramez A. Elmasri     |
+| Rob Vieira           |
+| Robert D. Schmidt    |
+| Roma Ligocka         |
+| Shamkant B. Navathe  |
+| Sue Monk Kidd        |
+| Tara Calishain       |
+| Wladyslaw Szpilman   |
+
+
+
+---

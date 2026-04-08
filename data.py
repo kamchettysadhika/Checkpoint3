@@ -4,23 +4,25 @@ import sqlite3
 # Load CSV
 df = pd.read_csv("Proj Data Unix.csv", encoding="latin1", header=0)
 
-df.columns = ["isbn","title","authors","publisher","year","price","category","c8","c9","c10"]
+df.columns = ["isbn", "title", "authors", "publisher", "year", "price", "category", "c8", "c9", "c10"]
 
-df['title'] = df['title'].ffill()
+df['title']     = df['title'].ffill()
+df['isbn']      = df['isbn'].ffill()        # ← added: forward-fill isbn
+df['category']  = df['category'].ffill()    # ← added: forward-fill category
 df['publisher'] = df['publisher'].ffill()
-df['year'] = df['year'].ffill()
-df['price'] = df['price'].ffill()
+df['year']      = df['year'].ffill()
+df['price']     = df['price'].ffill()
 
 df = df[df['title'].notna()]
 
-df['price'] = df['price'].replace('[\$,]', '', regex=True)
+df['price'] = df['price'].replace(r'[\$,]', '', regex=True)
 df['price'] = pd.to_numeric(df['price'], errors='coerce').fillna(0)
 
 df['authors'] = df.groupby('title')['authors'].transform(lambda x: ', '.join(x.dropna()))
 df = df.drop_duplicates(subset=['title'])
 
 # Connect to DB
-conn = sqlite3.connect("bookstore.db")
+conn = sqlite3.connect("database.sqlite")
 cursor = conn.cursor()
 
 # -------------------
@@ -49,24 +51,25 @@ for _, row in df.iterrows():
     pub_id = publishers.get(row.get("publisher"))
 
     cursor.execute("""
-        INSERT INTO BOOK (title, price, year_published, publisher_id)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO BOOK (title, isbn, price, year_published, publisher_id, genre)
+        VALUES (?, ?, ?, ?, ?, ?)
     """, (
         row.get("title"),
+        row.get("isbn"),
         row.get("price", 0),
         row.get("year"),
-        pub_id
+        pub_id,
+        row.get("category")
     ))
 
-    book_id = cursor.lastrowid  # ✅ correct placement
+    book_id = cursor.lastrowid
 
     # Handle authors
     author_list = list(set(
-    author.strip()
-    for author in str(row.get("authors")).split(",")
-    if author.strip()
-))
-
+        author.strip()
+        for author in str(row.get("authors")).split(",")
+        if author.strip()
+    ))
 
     for author in author_list:
         author = author.strip()
@@ -90,4 +93,3 @@ for _, row in df.iterrows():
 # Save changes
 conn.commit()
 conn.close()
-
